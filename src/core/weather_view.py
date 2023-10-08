@@ -156,13 +156,14 @@ class Weather(HomeDashboard):
         to a file named 'weather_data.json'.
 
         Parameters:
-        api_url (str): The URL of the API endpoint to send the GET request to.
+            - api_url (str): 
+                The URL of the API endpoint to send the GET request to.
 
         Raises:
-        aiohttp.ClientError: If an HTTP error occurs.
-        aiohttp.ClientResponseError: If the HTTP request returns a status other than 2xx.
-        aiohttp.ContentTypeError: If the response body is not JSON.
-        json.JSONDecodeError: If there's an error decoding the JSON response.
+            - aiohttp.ClientError: If an HTTP error occurs.
+            - aiohttp.ClientResponseError: If the HTTP request returns a status other than 2xx.
+            - aiohttp.ContentTypeError: If the response body is not JSON.
+            - json.JSONDecodeError: If there's an error decoding the JSON response.
         """
         async with aiohttp.ClientSession() as session:
             async with session.get(api_url) as response:
