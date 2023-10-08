@@ -69,6 +69,47 @@ class HomeDashboard(CharLCD):
             raise ValueError(
                 'The ``line`` argument must be either ``0`` or ``1``')
         
+    def write_static_and_dynamic(self, bottom_line, top_line=None, cntr_static=0):
+        """
+        Write a static str to top line and scrolling text to bottom line.
+
+        This function expects an top line input string which is shorter than 16
+        characters. This top line will remain static. The bottom line is
+        capable of handling longer strings by scrolling the text on the bottom
+        line.
+
+        Parameters
+            - bottom_line (str):
+                string which will scroll on bottom line of LCD display.
+            - top_line (str):
+                short string to print on top line.
+                Default: None (will print drawing)
+            - cntr_static (int)
+                whether or not the top line should be centered (0=no, 1=yes)
+                default: 0
+
+        Raises
+            - ValueError: if the top_line string is too long or
+                'cntr_static' arg is not 0 or 1
+        """
+        # Handle top_line printing
+        if len(top_line) <= 16:
+            if (cntr_static==0):
+                self.write_string(top_line)
+            elif (cntr_static==1):
+                self.write_centered(0, top_line)
+            else:
+                raise ValueError(
+                    'The ``cntr_static`` arg must be either ``0`` or ``1``')
+            
+        else:
+            raise ValueError(
+                'The ``top_line`` arg must be no longer than 16 characters`')
+        
+        # Handle bottom line scrolling
+        self.scroll_text(bottom_line, 1, 0.3)
+
+
     def scroll_text(self, text, line, delay):
         """
         Scrolls the given text from left to right on the specified line of a 16x2 LCD display.
