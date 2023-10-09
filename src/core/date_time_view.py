@@ -1,8 +1,8 @@
-from lcd_display import HomeDashboard
+from lcd_interface import LCD_Interface
 from datetime import datetime
 from time import sleep
 
-class DateTime(HomeDashboard):
+class DateTime(LCD_Interface):
     """
     A class to display the current date and time view.
 

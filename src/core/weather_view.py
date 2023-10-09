@@ -1,4 +1,4 @@
-from lcd_display import HomeDashboard
+from lcd_interface import LCD_Interface
 import requests
 import json
 import aiohttp
@@ -9,7 +9,7 @@ from time import sleep
 
 
 
-class Weather(HomeDashboard):
+class Weather(LCD_Interface):
     """
     A class to display the weather view.
 
