@@ -1,7 +1,7 @@
 from RPLCD.i2c import CharLCD
 from time import sleep
 
-class HomeDashboard(CharLCD):
+class LCD_Interface(CharLCD):
     """
     A class to interface with a 16*2 LCD display
 
@@ -133,10 +133,10 @@ class HomeDashboard(CharLCD):
             sleep(delay)
 
 def main():
-    home_dashboard = HomeDashboard()
+    lcd_interface = LCD_Interface()
     long_str = "This is a long string to display scrolling text functionality"
-    home_dashboard.scroll_text(long_str, 1, 0.5)
-    home_dashboard.scroll_text(long_str, "Hello", 1)
+    lcd_interface.scroll_text(long_str, 1, 0.5)
+    lcd_interface.scroll_text(long_str, "Hello", 1)
 
 if __name__ == "__main__":
     main()
