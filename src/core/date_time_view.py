@@ -1,4 +1,4 @@
-from lcd_interface import LCD_Interface
+from src.core.lcd_interface import LCD_Interface
 from datetime import datetime
 from time import sleep
 
