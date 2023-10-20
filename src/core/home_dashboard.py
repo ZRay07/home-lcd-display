@@ -20,6 +20,7 @@ class HomeDashboard():
         self.setup_gpio()
         self.main_button = 0
         self.secondary_button = 0
+        self.refresh_LCD = True
 
     # Dictionary to hold the mapping of buttons to GPIO pins
     INP_PIN_MAP = {
@@ -44,11 +45,22 @@ class HomeDashboard():
     def button_pressed_callback(self, channel):
         """
         The function to be called when a button is pressed.
-        Changes the "view" of the LCD display
+        
+        Pauses the refresh of the LCD display. Clears the LCD display. Changes
+        the "view" of the LCD display. Continues to refresh the LCD display.
         """
+        # Pause the refresh of the LCD display
+        self.refresh_LCD = None
+
+        # Clear the LCD display
+        self.lcd_interface.clear()
+
+        # If main button is pressed -> cycle to next view
         if channel == self.INP_PIN_MAP["main_btn"]:
-            print("main button pressed")
-            self.lcd_interface.clear()
+            # Set secondary button back to 0 so that it's always on default view
+            self.secondary_button = 0
+
+            # Main btn count goes from 0 to 1 to 2 to 3 and then back to 0 (4 views)
             if self.main_button < 3:
                 self.main_button += 1
             else:
@@ -56,15 +68,19 @@ class HomeDashboard():
 
             print(f"self.main_button: {self.main_button}")
         
+        # If secondary button is pressed -> switch to alt screen of same view
         elif channel == self.INP_PIN_MAP["secondary_btn"]:
-            print("secondary button pressed")
-            self.lcd_interface.clear()
+
+            # Scndry btn count goes from 0 to 1 and then back to 0 (only one alt screen / view)
             if self.secondary_button < 1:
                 self.secondary_button += 1
             else:
                 self.secondary_button = 0
 
             print(f"self.secondary_button: {self.secondary_button}")
+
+        # Reset the flag so the display can continue to refresh
+        self.refresh_LCD = True
 
     def cycle_views(self):
         """
@@ -75,19 +91,32 @@ class HomeDashboard():
         breadboard. Inside of a "view", the user can press the secondary button
         to show additional information.
         """
-        while True:
+        while self.refresh_LCD is not None:
             try:
                 if self.main_button == 0:
-                    self.date_time_view.poll_date_time()
+                    if self.secondary_button == 0:
+                        self.lcd_interface.write_centered(0, "date/time view")
+                    elif self.secondary_button == 1:
+                        self.lcd_interface.write_centered(0, "alt view")
 
                 elif self.main_button == 1:
                     if self.secondary_button == 0:
-                        asyncio.run(self.weather_view.current_weather_display())
+                        self.lcd_interface.write_centered(0, "current weather")
                     elif self.secondary_button == 1:
-                        self.weather_view.forecast_display()
+                        self.lcd_interface.write_centered(0, "forecast")
 
-                else:
-                    self.lcd_interface.write_string("empty")
+                elif self.main_button == 2:
+                    if self.secondary_button == 0:
+                        self.lcd_interface.write_centered(0, "dinner view")
+                    elif self.secondary_button == 1:
+                        self.lcd_interface.write_centered(0, "tmr dinner")
+
+                elif self.main_button == 3:
+                    if self.secondary_button == 0:
+                        self.lcd_interface.write_centered(0, "msg board")
+                    elif self.secondary_button == 1:
+                        self.lcd_interface.write_centered(0, "alt board")
+
                 sleep(1)
 
             except KeyboardInterrupt:
