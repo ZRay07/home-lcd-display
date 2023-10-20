@@ -1,3 +1,4 @@
+import asyncio
 from time import sleep
 
 from src.core.lcd_interface import LCD_Interface
@@ -18,6 +19,7 @@ class HomeDashboard():
         GPIO.setmode(GPIO.BOARD)
         self.setup_gpio()
         self.main_button = 0
+        self.secondary_button = 0
 
     # Dictionary to hold the mapping of buttons to GPIO pins
     INP_PIN_MAP = {
@@ -47,7 +49,7 @@ class HomeDashboard():
         if channel == self.INP_PIN_MAP["main_btn"]:
             print("main button pressed")
             self.lcd_interface.clear()
-            if self.main_button <= 3:
+            if self.main_button < 3:
                 self.main_button += 1
             else:
                 self.main_button = 0
@@ -56,6 +58,13 @@ class HomeDashboard():
         
         elif channel == self.INP_PIN_MAP["secondary_btn"]:
             print("secondary button pressed")
+            self.lcd_interface.clear()
+            if self.secondary_button < 1:
+                self.secondary_button += 1
+            else:
+                self.secondary_button = 0
+
+            print(f"self.secondary_button: {self.secondary_button}")
 
     def cycle_views(self):
         """
@@ -72,7 +81,10 @@ class HomeDashboard():
                     self.date_time_view.poll_date_time()
 
                 elif self.main_button == 1:
-                    self.weather_view.forecast_display()
+                    if self.secondary_button == 0:
+                        asyncio.run(self.weather_view.current_weather_display())
+                    elif self.secondary_button == 1:
+                        self.weather_view.forecast_display()
 
                 else:
                     self.lcd_interface.write_string("empty")
