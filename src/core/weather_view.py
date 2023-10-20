@@ -1,12 +1,12 @@
-from lcd_interface import LCD_Interface
-import requests
-import json
 import aiohttp
 import asyncio
 from datetime import datetime, timedelta
-
+import json
+from pathlib import Path
+import requests
 from time import sleep
 
+from src.core.lcd_interface import LCD_Interface
 
 
 class Weather(LCD_Interface):
@@ -39,6 +39,10 @@ class Weather(LCD_Interface):
             0b00000
         )
         self.create_char(0, self.degree_symbol)
+        # Define the current file's path
+        self.current_path = Path(__file__)
+        # Define the data directory's path relative to the current file
+        self.data_directory = self.current_path.parent.parent / "data"
 
     def add_timestamp(self, existing_data):
         """
@@ -93,7 +97,8 @@ class Weather(LCD_Interface):
             - json file:
                 a file to store the weather OR forecast data.
         """
-        with open(filename, 'w') as f:
+        file_path = self.data_directory / filename
+        with file_path.open('w') as f:
             json.dump(data, f)
 
     def load_data(self, filename='weather_data.json'):
@@ -109,7 +114,8 @@ class Weather(LCD_Interface):
             - json str:
                 json string with the file information
         """
-        with open(filename, 'r') as f:
+        file_path = self.data_directory / filename
+        with file_path.open('r') as f:
             return json.load(f)
         
     def print_last_updated(self):
