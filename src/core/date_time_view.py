@@ -50,17 +50,12 @@ class DateTime(LCD_Interface):
         return formatted_date
     
     def poll_date_time(self):
-        while True:
-            try:
-                self.date, self.time = self.get_date_time()
-                self.date = self.format_date(self.date)
-                self.write_centered(0, self.date)
-                self.write_centered(1, self.time)
-                sleep(1)
+        self.date, self.time = self.get_date_time()
+        self.date = self.format_date(self.date)
+        self.write_centered(0, self.date)
+        self.write_centered(1, self.time)
 
-            except KeyboardInterrupt:
-                print("\nExiting...")
-                return
+        
             
 
 
