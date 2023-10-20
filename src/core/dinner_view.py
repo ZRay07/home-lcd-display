@@ -110,23 +110,19 @@ class Dinner(LCD_Interface):
         Sides are stored as a list. If there are no sides, the list is stored
         as empty strings. 
         
-        If the list is only empty strings, then "No sides" will be printed to
-        the LCD display.
+        If the list is only empty strings, then "No sides" is printed.
         
-        If there is only one side, then print "Side: {side 1}".
+        If there is only one side, then "Side: {side 1}" is printed.
 
-        If there is more than one side, we need to start considering the length
-        of the string. For example, multiple sides will be concatenated in the
-        form: "Sides: {side 1} + {side 2} + {side 3}". The " + {side 3}" should
-        only be included if it is not an empty string in the list.
+        If there is multiple sides, they will be concatenated in the form:
+        "Sides: {side 1} + {side 2} + {side 3}". The " + {side 3}" is only
+        included if it exists in the list.
 
-        If the full string: "Sides: {side 1} + {side 2}" is less than or equal
-        to 16 characters, the `write_centered` function will be used to print
-        the string to the LCD display.
+        If the full string is less than or equal to 16 characters, the 
+        `write_centered` function will be used to print the string to the LCD display.
 
-        If the full string: "Sides: {side 1} + {side 2} + {side 3}" is longer
-        than 16 characters, the `scroll_text` function will be used to print
-        the string to the LCD display.
+        If the full string is longer than 16 characters, the `scroll_text`
+        function will be used to print the string to the LCD display.
 
         Parameters:
             - sides (list):
@@ -150,6 +146,9 @@ class Dinner(LCD_Interface):
                 sides_str += side
                 if i < len(sides) - 1:
                     sides_str += " + "
+
+        else:
+            return "Invalid list of sides"
 
         # Check the length of the final string and display accordingly
         if len(sides_str) <= 16:
