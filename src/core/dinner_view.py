@@ -1,5 +1,5 @@
 from src.core.lcd_interface import LCD_Interface
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import sleep
 
 class Dinner(LCD_Interface):
@@ -98,10 +98,11 @@ class Dinner(LCD_Interface):
         display and center the string. If the main course is longer than 16
         characters, it uses the `scroll_text` function to display the information.
         """
-        if len(main_course) <= 16:
-            self.write_centered(0, main_course)
+        main_str = f"Main: {main_course}"
+        if len(main_str) <= 16:
+            self.write_centered(0, main_str)
         else:
-            self.scroll_text(main_course, 0, 0.5)
+            self.scroll_text(main_str, 0, 0.5)
 
     def sides_display(self, sides):
         """
@@ -154,19 +155,75 @@ class Dinner(LCD_Interface):
         if len(sides_str) <= 16:
             self.write_centered(1, sides_str)
         else:
-            self.scroll_text(sides_str, 1, 0.3)
+            self.scroll_text(sides_str, 1, 0.5)
 
+    def get_weekday_and_monday_date(self):
+        """
+        Gets the date of the current week's monday.
+
+        Dinner plans are stored by week and by day of the week. The week is
+        stored as MM/DD of that weeks monday. So the week of October 23-30
+        would be saved under the 10/23 structure. Below this week structure,
+        dinner plans are split by days of the week (lowercase e.g. monday, 
+        tuesday, sunday, etc.)
+
+        Returns:
+            - str: the date of the current week's monday in MM/DD format
+            - str: the current weekday
+        """
+        # Get the current date
+        current_date = datetime.now().date()
+
+        # Get the current weekday (0=monday, 1=tuesday, 2=wednesday, etc.)
+        current_weekday = current_date.weekday()
+
+        # Calculate the date for Monday of the current week
+        monday_date = current_date - timedelta(days=current_weekday)
+
+        # Get the month and day
+        month = monday_date.month
+        day = monday_date.day
+
+        # Get into MM/DD format
+        monday_date_str = f"{month}/{day}"
+
+        # Dict to store mapping from int to string weekday
+        weekdays = {
+            0: "monday",
+            1: "tuesday",
+            2: "wednesday",
+            3: "thursday",
+            4: "friday",
+            5: "saturday",
+            6: "sunday"
+        }
+        # Convert int to string using dict key-value pair
+        current_weekday_str = weekdays.get(current_weekday)
+
+        return monday_date_str, current_weekday_str
+
+    def dinner_plan_display(self):
+        """
+        Fetches the dinner plan of the day and prints it to LCD display.
+        """
+        # Load json data
+        dinner_data = self.load_data('dinner_data.json')
+        
+        # Get the date of the current week's monday and the current day
+        monday_date, current_weekday = self.get_weekday_and_monday_date()
+
+        # Load the main course and sides for the current day
+        main_course = self.get_main_course(dinner_data, monday_date, current_weekday)
+        sides = self.get_sides(dinner_data, monday_date, current_weekday)
+
+        # Display data to LCD
+        self.main_course_display(main_course)
+        self.sides_display(sides)
         
 
 
 
 if __name__ == "__main__":
     dinner_view = Dinner(1)
-    data=dinner_view.load_data('dinner_data.json')
-    main_course = dinner_view.get_main_course(data, "10/16", "monday")
-    print(f"{main_course}")
-    dinner_view.main_course_display(main_course)
-    sides = dinner_view.get_sides(data, "10/16", "monday")
-    print(f"{sides}")
-    dinner_view.sides_display(sides)
+    dinner_view.dinner_plan_display()
 

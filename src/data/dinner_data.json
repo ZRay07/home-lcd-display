@@ -3,7 +3,7 @@
     {
         "monday":
             {
-                "main": "three-bean chili...",
+                "main": "three-bean chili",
                 "side 1": "baked potato",
                 "side 2": "None",
                 "side 3": "None"
@@ -25,8 +25,8 @@
         "thursday":
             {
                 "main": "hotdogs",
-                "side 1": "beans and beets",
-                "side 2": "None",
+                "side 1": "beans",
+                "side 2": "beets",
                 "side 3": "None"
             },
         "friday":
