@@ -1,8 +1,6 @@
 import aiohttp
 import asyncio
 from datetime import datetime, timedelta
-import json
-from pathlib import Path
 import requests
 from time import sleep
 
@@ -39,20 +37,6 @@ class Weather(LCD_Interface):
             0b00000
         )
         self.create_char(0, self.degree_symbol)
-        # Define the current file's path
-        self.current_path = Path(__file__)
-        # Define the data directory's path relative to the current file
-        self.data_directory = self.current_path.parent.parent / "data"
-
-    def add_timestamp(self, existing_data):
-        """
-        Adds a timestamp to Weather data.
-        """
-        current_time = datetime.now()
-        timestamp_str = current_time.isoformat()
-        existing_data['last_fetched'] = timestamp_str
-        return existing_data
-
 
     def get_current_weather(self):
         """
@@ -81,42 +65,6 @@ class Weather(LCD_Interface):
         forecast = forecast_response.json()
         forecast = self.add_timestamp(forecast)
         return forecast
-
-    def save_data(self, data, filename='weather_data.json'):
-        """
-        Stores responses from WeatherAPI to 'weather_data.json' file.
-
-        Parameters
-            - data (json string):
-                should be the response from the api
-            - filename (str):
-                the file to store the json string to
-                default: weather_data.json
-
-        Returns:
-            - json file:
-                a file to store the weather OR forecast data.
-        """
-        file_path = self.data_directory / filename
-        with file_path.open('w') as f:
-            json.dump(data, f)
-
-    def load_data(self, filename='weather_data.json'):
-        """
-        Loads responses from json file.
-
-        Parameters
-            - filename (str):
-                the file to load the json string from
-                default: weather_data.json
-
-        Returns:
-            - json str:
-                json string with the file information
-        """
-        file_path = self.data_directory / filename
-        with file_path.open('r') as f:
-            return json.load(f)
         
     def print_last_updated(self):
         """
@@ -176,27 +124,19 @@ class Weather(LCD_Interface):
                 data = await response.json()
                 if api_url == self.current_weather_url:
                     self.current_weather = self.load_data('weather_data.json')
-                self.save_data(data)
+                self.save_data(data, 'weather_data.json')
                 return data
 
     def start_update_task(self, api_url):
         self.update_task = asyncio.create_task(self.fetch_and_update(api_url))
-
 
     async def current_weather_display(self):
         """
         Displays current weather information to LCD display.
 
         If the new request has not completed, it will display previous
-            information stored in the weather_data.json file. Once the
-            request has completed, it will update the display to show more
-            current information.
-
-        Parameters
-            - 
-
-        Returns:
-            - 
+        information stored in the weather_data.json file. Once the request
+        has completed, it will update the display to show more current info.
         """
         # Start the update task
         self.start_update_task(self.current_weather_url)
@@ -279,9 +219,10 @@ class Weather(LCD_Interface):
             self.write_centered(1, "weather data")
             self.forecast_data = self.get_forecast()
             self.save_data(self.forecast_data, "forecast_data.json")
+            
+            # Once the new data has been stored, clear the LCD display
+            self.clear()
 
-        
-        
         # Extracting tomorrow's weather information
         self.forecast_data = self.load_data("forecast_data.json")
         tomorrow_temperature = self.forecast_data['forecast']['forecastday'][1]['day']['avgtemp_f']
@@ -291,7 +232,7 @@ class Weather(LCD_Interface):
         if len(tomorrow_condition) >= 16:
             tomorrow_condition = tomorrow_condition[:16]
 
-        # Output the data
+        # Output the data to the LCD display
         print(f"Tomorrow's temperature: {tomorrow_temperature}°F")
         print(f"Tomorrow's condition: {tomorrow_condition}")
 

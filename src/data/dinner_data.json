@@ -1,0 +1,54 @@
+{
+    "10/16":
+    {
+        "monday":
+            {
+                "main": "three-bean chili",
+                "side 1": "baked potato",
+                "side 2": "None",
+                "side 3": "None"
+            },
+        "tuesday":
+            {
+                "main": "chicken",
+                "side 1": "rice",
+                "side 2": "pepper",
+                "side 3": "onion"
+            },
+        "wednesday":
+            {
+                "main": "broccoli alfredo",
+                "side 1": "None",
+                "side 2": "None",
+                "side 3": "None"
+            },
+        "thursday":
+            {
+                "main": "hotdogs",
+                "side 1": "beans",
+                "side 2": "beets",
+                "side 3": "None"
+            },
+        "friday":
+            {
+                "main": "pizza/pazzo",
+                "side 1": "None",
+                "side 2": "None",
+                "side 3": "None"
+            },
+        "saturday":
+            {
+                "main": "shepherd's pie",
+                "side 1": "None",
+                "side 2": "None",
+                "side 3": "None"
+            },
+        "sunday":
+            {
+                "main": "chili with baked potato",
+                "side 1": "None",
+                "side 2": "None",
+                "side 3": "None"
+            }
+    }
+}

@@ -1,16 +1,27 @@
-from RPLCD.i2c import CharLCD
+from datetime import datetime
+import json
+from pathlib import Path
 from time import sleep
+
+from RPLCD.i2c import CharLCD
+
 
 class LCD_Interface(CharLCD):
     """
-    A class to interface with a 16*2 LCD display
+    A class to interface with a 16*2 LCD display.
+
+    This class creates special printing functions which allow us to write info
+    to the LCD display. `write_centered` takes a line number and a string and
+    it prints the string to the specified line while centering the characters.
+    
+    It also stores functionality for writing to and loading from json files.
+    This functionality is used by multiple inherited classes.
 
     Parameters
         - verbosity (int):
             Changes how much information is displayed. Can be 0 or 1 or 2.
             Default: 1
     """
-
     def __init__(self, verbosity=1):
         super().__init__(i2c_expander="PCF8574",
                            address=0x27,
@@ -26,6 +37,11 @@ class LCD_Interface(CharLCD):
         else:
             raise ValueError(
                 'The ``verbosity`` argument must be either ``0`` or ``1`` or ``2``')  
+        
+        # Define the current file's path
+        self.current_path = Path(__file__)
+        # Define the data directory's path relative to the current file
+        self.data_directory = self.current_path.parent.parent / "data"
         
     def set_verbosity(self, verbosity):
         self.verbosity = verbosity
@@ -131,6 +147,57 @@ class LCD_Interface(CharLCD):
             self.cursor_pos = (line, 0)
             self.write_string(display_text)
             sleep(delay)
+
+    def save_data(self, data, filename):
+        """
+        Stores data to a json file.
+
+        Parameters
+            - data (json string):
+                the data to be stored in the json file
+            - filename (str):
+                the file to store the json string to
+        """
+        file_path = self.data_directory / filename
+        with file_path.open('w') as f:
+            json.dump(data, f)
+
+    def load_data(self, filename):
+        """
+        Loads data from json file.
+
+        Parameters
+            - filename (str):
+                the file to load the json string from
+
+        Returns:
+            - json string with the file information
+        """
+        file_path = self.data_directory / filename
+        with file_path.open('r') as f:
+            return json.load(f)
+        
+    def add_data(self, filename):
+        """
+        Updates data stored in a json file.
+
+        Loads data from json file. Adds additional data to the json str. Saves
+        the old and additional data back to the original file.
+
+        Parameters
+            - filename (str):
+                the file to load from and save to
+        """
+        print(f"adding data to {filename}")
+        
+    def add_timestamp(self, existing_data):
+        """
+        Adds a timestamp to existing data.
+        """
+        current_time = datetime.now()
+        timestamp_str = current_time.isoformat()
+        existing_data['last_fetched'] = timestamp_str
+        return existing_data
 
 def main():
     lcd_interface = LCD_Interface()
