@@ -11,8 +11,12 @@ app = Flask(__name__)
 
 # Define a route for submitting the form, accepting POST requests
 @app.route('/submit', methods=['POST'])
-# Function to handle form submission
 def submit():
+    """
+    This function handles message submission. It receives input messages and
+    re-directs the page back to the empty html file when the message is
+    received.
+    """
     # Get the submitted message from the form
     message = request.form['message']
     # TODO: send message to LCD
@@ -20,11 +24,13 @@ def submit():
     # Redirect back to the home page (where index.html is served)
     return redirect(url_for('home'))
 
-# Route for the home page
+# Route for the home page (index.html)
 @app.route('/')
-# Function to serve the HTML form
 def home():
-    # Render the HTML form from a string (assuming it is read from "index.html")
+    """
+    This function renders the HTML form from a string (assuming it is read
+    from "index.html").
+    """
     return render_template_string(open(current_path.parent / "index.html").read())
 
 # main entry point of the application
