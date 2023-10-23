@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Submit Message</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+
+    <body>
+        <h1>Submit Your Message</h1>
+        <form action="/save_text" method="post">
+            <input type="text" name="message" placeholder="Enter text">
+            <input type="submit" value="Submit">
+        </form>
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+    <a href="/">Back to Home</a>
+</body>
+</html>
