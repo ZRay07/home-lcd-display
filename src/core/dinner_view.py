@@ -221,8 +221,6 @@ class Dinner(LCD_Interface):
         self.sides_display(sides)
         
 
-
-
 if __name__ == "__main__":
     dinner_view = Dinner(1)
     dinner_view.dinner_plan_display()
