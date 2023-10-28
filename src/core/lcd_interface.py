@@ -195,7 +195,7 @@ class LCD_Interface(CharLCD):
         Adds a timestamp to existing data.
         """
         current_time = datetime.now()
-        timestamp_str = current_time.isoformat()
+        timestamp_str = current_time.strftime("%m/%d/y %I:%M %p")
         existing_data['last_fetched'] = timestamp_str
         return existing_data
 

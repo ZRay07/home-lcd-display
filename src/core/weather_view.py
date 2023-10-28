@@ -85,6 +85,7 @@ class Weather(LCD_Interface):
         
         # Reformat the time into standard time (as opposed to military)
         if int_hour >= 12:
+            print("time greater than or equal to 12")
             int_hour = int_hour - 12
             str_hour = f"0{str(int_hour)}"
             formatted_loaded_time = f"{str_hour}:{formatted_loaded_time[3:]} PM"
@@ -92,13 +93,23 @@ class Weather(LCD_Interface):
         else:
             formatted_loaded_time = f"{loaded_time[11:]} AM"
 
+        # concatenate date and time into one string
+        date_and_time = f"{loaded_time[:10]}   {formatted_loaded_time}"
+
+        # Print the last updated message as well as date and time
         self.write_centered(0, "Last Updated")
-        sleep(2)
-        self.clear()
-        self.write_centered(0, loaded_time[:10])
-        self.write_centered(1, formatted_loaded_time)
-        sleep(7)
-        self.clear()
+        self.scroll_text(date_and_time, 1, 0.5)
+
+
+
+        # Old printing strategy
+#        self.write_centered(0, "Last Updated")
+#        sleep(2)
+#        self.clear()
+#        self.write_centered(0, loaded_time[:10])
+#        self.write_centered(1, formatted_loaded_time)
+#        sleep(7)
+#        self.clear()
         
     async def fetch_and_update(self, api_url):
         """
@@ -138,55 +149,47 @@ class Weather(LCD_Interface):
         information stored in the weather_data.json file. Once the request
         has completed, it will update the display to show more current info.
         """
-        # Start the update task
+        # Start the update task (fetch new weather data)
         self.start_update_task(self.current_weather_url)
 
+        # Display date and time last data is from
         self.print_last_updated()
 
-        while True:
-            try:
-                if self.update_task.done():
-                    print("new weather information...")
-                    self.print_last_updated()
-                    self.current_weather = self.update_task.result()
+        if self.update_task.done():
+            print("new weather information...")
+            # Display time from which new weather data is from
+            self.print_last_updated() 
+            self.current_weather = self.update_task.result()
 
-                    # weather data is updated roughly every 15 mins (900 sec)
-                    if self.time_passed >= 900:
-                        # Restart the update task
-                        self.start_update_task(self.current_weather_url)
+            
+            # Restart the update task
+            self.start_update_task(self.current_weather_url)
 
-                if self.current_weather is not None:
-                    # Extracting current day weather information
-                    current_temperature = self.current_weather['current']['temp_f']
-                    str_current_temp = f"{current_temperature}°F"
-                    current_condition = self.current_weather['current']['condition']['text']
-                    # Output the data to LCD
-                    self.write_centered(0, str_current_temp)
-                    self.cursor_pos = (0, 9)
-                    self.write_string('\x00')
-                    self.write_centered(1, current_condition)
+        if self.current_weather is not None:
+            # Extracting current day weather information
+            current_temperature = self.current_weather['current']['temp_f']
+            str_current_temp = f"{current_temperature}°F"
+            current_condition = self.current_weather['current']['condition']['text']
+            # Output the data to LCD
+            self.write_centered(0, str_current_temp)
+            self.cursor_pos = (0, 9)
+            self.write_string('\x00')
+            self.write_centered(1, current_condition)
 
-                    # Reset current_weather flag
-                    self.current_weather = None
+            # Reset current_weather flag
+            self.current_weather = None
 
-                else:
-                    # Load existing data from json file and extract same info
-                    loaded_weather = self.load_data('weather_data.json')
-                    loaded_temp = loaded_weather['current']['temp_f']
-                    str_loaded_temp = f"{loaded_temp}°F" 
-                    loaded_condition = loaded_weather['current']['condition']['text']
-                    # Output the data to LCD
-                    self.write_centered(0, str_loaded_temp)
-                    self.cursor_pos = (0, 9)
-                    self.write_string('\x00')
-                    self.write_centered(1, loaded_condition)
-
-                await asyncio.sleep(60)
-                self.time_passed = self.time_passed + 60
-
-            except KeyboardInterrupt:
-                print("\nExiting...")
-                return
+        else:
+            # Load existing data from json file and extract same info
+            loaded_weather = self.load_data('weather_data.json')
+            loaded_temp = loaded_weather['current']['temp_f']
+            str_loaded_temp = f"{loaded_temp}°F" 
+            loaded_condition = loaded_weather['current']['condition']['text']
+            # Output the data to LCD
+            self.write_centered(0, str_loaded_temp)
+            self.cursor_pos = (0, 9)
+            self.write_string('\x00')
+            self.write_centered(1, loaded_condition)
 
     def forecast_display(self):
         """
