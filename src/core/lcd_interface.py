@@ -42,6 +42,17 @@ class LCD_Interface(CharLCD):
         self.current_path = Path(__file__)
         # Define the data directory's path relative to the current file
         self.data_directory = self.current_path.parent.parent / "data"
+        self.degree_symbol = (
+            0b00000,
+            0b00100,
+            0b01010,
+            0b00100,
+            0b00000,
+            0b00000,
+            0b00000,
+            0b00000
+        )
+        self.create_char(0, self.degree_symbol)
         
     def set_verbosity(self, verbosity):
         self.verbosity = verbosity
