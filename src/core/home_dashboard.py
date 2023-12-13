@@ -57,7 +57,8 @@ class HomeDashboard():
 
         # If main button is pressed -> cycle to next view
         if channel == self.INP_PIN_MAP["main_btn"]:
-            # Set secondary button back to 0 so that it's always on default view
+            # Set secondary button back to 0 so that it's always on first view
+            # when switching between the 4 main views
             self.secondary_button = 0
 
             # Main btn count goes from 0 to 1 to 2 to 3 and then back to 0 (4 views)
@@ -95,13 +96,14 @@ class HomeDashboard():
             try:
                 if self.main_button == 0:
                     if self.secondary_button == 0:
-                        self.lcd_interface.write_centered(0, "date/time view")
+                        self.date_time_view.date_time_display()
                     elif self.secondary_button == 1:
                         self.lcd_interface.write_centered(0, "alt view")
 
                 elif self.main_button == 1:
                     if self.secondary_button == 0:
-                        self.lcd_interface.write_centered(0, "current weather")
+                        #self.lcd_interface.write_centered(0, "current weather")
+                        asyncio.run(self.weather_view.current_weather_display())
                     elif self.secondary_button == 1:
                         self.lcd_interface.write_centered(0, "forecast")
 
